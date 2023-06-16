@@ -3,6 +3,8 @@ const Users = require("../schemas/Users");
 const requireAuth = async (req, res, next) => {
   const { authorization } = req.headers;
 
+  console.log("header:", req.headers)
+
   if (!authorization) {
     return res.status(401).json({ error: " You are not authorized" });
   }
@@ -13,7 +15,7 @@ const requireAuth = async (req, res, next) => {
     req.user = await Users.findOne({ _id }).select("_id");
     next();
   } catch (error) {
-    res.status(401).json({ error: "oupsss" });
+    res.status(401).json({ error: "oupsss, appears you are not authorized" });
   }
 };
 module.exports = requireAuth;

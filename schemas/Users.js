@@ -1,26 +1,24 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const validator = require("validator");
 
 //Schema for the user
 const usersSchema = new mongoose.Schema({
   first_name: { type: String, required: true },
   last_name: { type: String, required: true },
-  user_name: { type: String },
   email: {
     type: String,
     required: true,
     unique: true,
-    match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      "Please use a valid email",
-    ],
   },
   password: { type: String, required: true },
 });
 
 // creating a custom static method
 
-usersSchema.statics.signup = async function (email, password) {
+usersSchema.statics.signup = async function (first_name, last_name, email, password) {
   //check the existing of the user
+
   const exists = await this.findOne({ email });
   if (exists) {
     throw Error("email already in use");
@@ -45,7 +43,7 @@ usersSchema.statics.signup = async function (email, password) {
   const hash = await bcrypt.hash(password, salt);
 
   //create user
-  const user = await this.create({ email, password: hash });
+  const user = await this.create({ first_name, last_name, email, password: hash });
   return user;
 };
 

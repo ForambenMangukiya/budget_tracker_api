@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
+
 const transactionSchema = new mongoose.Schema({
   category_name: {
+    type: String,
+  },
+  tran_description: {
     type: String,
   },
   tran_amount: {
@@ -14,10 +18,10 @@ const transactionSchema = new mongoose.Schema({
     type: String,
   },
   tran_date: {
-    type: String,
+    type: Date,
   },
   user: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Users",
   },
 });

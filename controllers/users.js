@@ -22,49 +22,51 @@ const loginUser = async (req, res) => {
 //signup user
 
 const signupUser = async (req, res) => {
-  const { email, password } = req.body;
+  console.log("body:", req.body);
+  const { first_name, last_name, email, password } = req.body;
 
   try {
-    const user = await Users.signup(email, password);
+    const user = await Users.signup(first_name, last_name, email, password);
     const token = createToken(user._id);
     res.status(200).json({ email, token });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
 // function newUser
 //  --- ADD USER
-const newUser = async (req, res) => {
-  try {
-    console.log("body:", req.body);
-    const { first_name, last_name, user_name, email, password } = req.body;
-    const user = await Users.findOne({ email: email });
-    if (user) {
-      res.status(409).json({
-        success: false,
-        msg: "Email already exists , try another one",
-      });
-    } else {
-      const user = await Users.create({
-        first_name,
-        last_name,
-        user_name,
-        email,
-        password,
-      });
-      res.status(201).json({
-        success: true,
-        msg: "Registration completed",
-        data: user,
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error,
-    });
-  }
-};
+// const newUser = async (req, res) => {
+//   try {
+//     console.log("body:", req.body);
+//     const { first_name, last_name, user_name, email, password } = req.body;
+//     const user = await Users.findOne({ email: email });
+//     if (user) {
+//       res.status(409).json({
+//         success: false,
+//         msg: "Email already exists , try another one",
+//       });
+//     } else {
+//       const user = await Users.create({
+//         first_name,
+//         last_name,
+//         user_name,
+//         email,
+//         password,
+//       });
+//       res.status(201).json({
+//         success: true,
+//         msg: "Registration completed",
+//         data: user,
+//       });
+//     }
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       error,
+//     });
+//   }
+// };
 
 // function updateUser
 
@@ -110,7 +112,7 @@ const deleteOneUser = async (req, res) => {
 module.exports = {
   loginUser,
   signupUser,
-  newUser,
+  /* newUser, */
   updateUser,
   deleteOneUser,
 };
