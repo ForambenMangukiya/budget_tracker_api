@@ -1,11 +1,10 @@
-//TODOs:
 const Transaction = require("../schemas/Transactions");
 
 // function newTransaction
   const newTransaction = async (req, res) => {
-    console.log("request:", req.user.id)
     try {
       const { category_name, tran_description, tran_amount, tran_sign, tran_currency, tran_date } = req.body;
+      const user = req.user._id;
   
       const newTransaction = await Transaction.create({
         category_name, // HOUSE, TRANSPORTATION
@@ -16,8 +15,7 @@ const Transaction = require("../schemas/Transactions");
         tran_date,
         user,
       });
-  
-      res.status(201).json(newTransaction);
+      res.status(201).json({success: true, data: newTransaction});
     } catch (error) {
       res.status(400).json({msg:error})
     }
@@ -27,21 +25,22 @@ const Transaction = require("../schemas/Transactions");
 const deleteTransaction = async (req, res) => {
   try {
     const { id } = req. params;
-    const deletedTransaction = await Transaction.findByIdAndDelete({ _id: id });
+    const deletedTransaction = await Transaction.findByIdAndDelete(id);
 
     if (!deletedTransaction) {
       return res.status(404).json({ error: "Transaction not found" });
     }
-    res.status(200).json(deletedTransaction);
+    res.status(200).json({success: true, data: deletedTransaction});
   } catch (error) {
-    res.status(400).json({msg:error})
+    res.status(400).json({error})
   }
 }
 
 // function getAll Transactions for a user
 const getAllTransaction = async (req, res) => {
   try {
-    const user = req.user;
+    const user = req.user._id;
+    console.log("req.user._id:", req.user._id)
     const transactions = await Transaction.find({ user });
     res.status(200).json(transactions);
     } catch (error) {
@@ -53,21 +52,19 @@ const getAllTransaction = async (req, res) => {
 const updateTransaction= async (req, res) => {
   try {
     const { id } = req.params;
-    const { category_name,tran_description, tran_amount, tran_sign, tran_currency, tran_date } = req.body;
-    const existingTrans = await Transaction.findById(id)
-
+    const { category_name,tran_description, tran_amount, tran_currency, tran_date } = req.body;
     const updatedTransaction = await Transaction.findByIdAndUpdate(id,
       {
-        category_name: category_name,
-        tran_description: tran_description,
-        tran_amount: tran_amount,
-        tran_currency: tran_currency,
-        tran_date: tran_date,
+        category_name,
+        tran_description,
+        tran_amount,
+        tran_currency,
+        tran_date,
       }
     );
 
   if (!updatedTransaction) {
-    return res.status(404).json({success: false });
+    return res.status(404).json({ error });
   }
 
   res.status(200).json({success: true, data: updatedTransaction});

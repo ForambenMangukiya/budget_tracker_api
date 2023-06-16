@@ -12,17 +12,11 @@ const api = express.Router();
 
 api.use(requireAuth);
 
-// ("/").post(newTransaction);
-// api.route("/new").post(newTransaction);
-api.route("/new").post(newTransaction);
+// ROUTE : Get All Transactions and Create Transaction
+api.route("/").get(getAllTransaction).post(newTransaction);
 
-// ("/delete/:txn_id").delete(deleteTransaction)
-api.route("/delete/:txn_id").delete(deleteTransaction);
+// ROUTE : Delete One Transaction and Update One Transaction
+api.route("/:id").delete(deleteTransaction).put(updateTransaction);
 
-// ("/transactions").get(getAllTransaction)
-api.route("/").get(getAllTransaction);
-
-// ("/update/:txn_id").put(updateTransaction)
-api.route("/update/:txn_id").put(updateTransaction);
 
 module.exports = api;
