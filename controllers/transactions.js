@@ -1,5 +1,4 @@
 //TODOs:
-
 const transaction = require("../schemas/Transactions");
 
 // function newTransaction
