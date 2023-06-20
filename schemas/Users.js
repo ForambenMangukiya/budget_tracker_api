@@ -1,6 +1,22 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
+//Schema for the budget
+const budgetsSchema = new mongoose.Schema({
+  category_name: {
+    type: String,
+  },
+  budget_description: {
+    type: String,
+  },
+  limit_amount: {
+    type: String,
+  },
+  budget_date: {
+    type: Date,
+  },
+})
+
 
 //Schema for the user
 const usersSchema = new mongoose.Schema({
@@ -12,11 +28,15 @@ const usersSchema = new mongoose.Schema({
     unique: true,
   },
   password: { type: String, required: true },
+  country_code: { type: String},
+  access_token: { type: String },
+  budgets: [budgetsSchema],
 });
 
 // creating a custom static method
 
-usersSchema.statics.signup = async function (first_name, last_name, email, password) {
+usersSchema.statics.signup = async function (first_name, last_name, email, password, 
+  country_code, access_token, category_name, budget_description, limit_amount, budget_date) {
   //check the existing of the user
 
   const exists = await this.findOne({ email });
@@ -43,7 +63,8 @@ usersSchema.statics.signup = async function (first_name, last_name, email, passw
   const hash = await bcrypt.hash(password, salt);
 
   //create user
-  const user = await this.create({ first_name, last_name, email, password: hash });
+  const user = await this.create({ first_name, last_name, email, password: hash,
+  country_code, access_token, budgets: [{ category_name, budget_description, limit_amount, budget_date }] });
   return user;
 };
 

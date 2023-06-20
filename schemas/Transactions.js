@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-
 const transactionSchema = new mongoose.Schema({
   category_name: {
     type: String,
@@ -23,6 +22,9 @@ const transactionSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Users",
+  },
+  tran_id: {
+    type: String,
   },
 });
 

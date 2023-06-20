@@ -22,10 +22,12 @@ const loginUser = async (req, res) => {
 
 const signupUser = async (req, res) => {
   console.log("body:", req.body);
-  const { first_name, last_name, email, password } = req.body;
+  const { first_name, last_name, email, password, country_code, access_token, 
+    budgets: [{ category_name, budget_description, limit_amount, budget_date}]  } = req.body;
 
   try {
-    const user = await Users.signup(first_name, last_name, email, password);
+    const user = await Users.signup(first_name, last_name, email, password, country_code, access_token, 
+    category_name, budget_description, limit_amount, budget_date);
     const token = createToken(user._id);
     res.status(200).json({ email, token });
   } catch (error) {
@@ -38,12 +40,23 @@ const signupUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { first_name, last_name, email, password } = req.body;
+    // const { first_name, last_name, email, password } = req.body;
+    const { first_name, last_name, email, password, country_code, access_token, 
+      budgets: [{ category_name, budget_description, limit_amount, budget_date}]  } = req.body;
     const user = await Users.findByIdAndUpdate(id, {
       first_name,
       last_name,
       email,
       password,
+      country_code,
+      access_token,
+      budgets: [
+        {
+          category_name,
+          budget_description,
+          limit_amount,
+          budget_date,
+        }]
     });
     if (!user) {
       res.status(404).json({ success: false, msg: " i don't know this user " });
