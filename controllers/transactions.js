@@ -3,7 +3,7 @@ const Transaction = require("../schemas/Transactions");
 // function newTransaction
   const newTransaction = async (req, res) => {
     try {
-      const { category_name, tran_description, tran_amount, tran_sign, tran_currency, tran_date } = req.body;
+      const { category_name, tran_description, tran_amount, tran_sign, tran_currency, tran_date, tran_id } = req.body;
       const user = req.user._id;
   
       const newTransaction = await Transaction.create({
@@ -14,6 +14,7 @@ const Transaction = require("../schemas/Transactions");
         tran_currency,
         tran_date,
         user,
+        tran_id,
       });
       res.status(201).json({success: true, data: newTransaction});
     } catch (error) {
@@ -52,7 +53,7 @@ const getAllTransaction = async (req, res) => {
 const updateTransaction= async (req, res) => {
   try {
     const { id } = req.params;
-    const { category_name,tran_description, tran_amount, tran_currency, tran_date } = req.body;
+    const { category_name,tran_description, tran_amount, tran_currency, tran_date, tran_id } = req.body;
     const updatedTransaction = await Transaction.findByIdAndUpdate(id,
       {
         category_name,
@@ -60,6 +61,7 @@ const updateTransaction= async (req, res) => {
         tran_amount,
         tran_currency,
         tran_date,
+        tran_id
       }
     );
 
