@@ -10,6 +10,7 @@ const newTransaction = async (req, res) => {
       tran_sign,
       tran_currency,
       tran_date,
+      tran_id,
     } = req.body;
     const user = req.user._id;
 
@@ -21,6 +22,7 @@ const newTransaction = async (req, res) => {
       tran_currency,
       tran_date,
       user,
+      tran_id,
     });
     res.status(201).json({ success: true, data: newTransaction });
   } catch (error) {
@@ -65,6 +67,7 @@ const updateTransaction = async (req, res) => {
       tran_amount,
       tran_currency,
       tran_date,
+      tran_id,
     } = req.body;
     const updatedTransaction = await Transaction.findByIdAndUpdate(id, {
       category_name,
@@ -72,6 +75,7 @@ const updateTransaction = async (req, res) => {
       tran_amount,
       tran_currency,
       tran_date,
+      tran_id,
     });
 
     if (!updatedTransaction) {
