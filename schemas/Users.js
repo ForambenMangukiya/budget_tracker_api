@@ -16,7 +16,12 @@ const usersSchema = new mongoose.Schema({
 
 // creating a custom static method
 
-usersSchema.statics.signup = async function (first_name, last_name, email, password) {
+usersSchema.statics.signup = async function (
+  first_name,
+  last_name,
+  email,
+  password
+) {
   //check the existing of the user
 
   const exists = await this.findOne({ email });
@@ -43,7 +48,12 @@ usersSchema.statics.signup = async function (first_name, last_name, email, passw
   const hash = await bcrypt.hash(password, salt);
 
   //create user
-  const user = await this.create({ first_name, last_name, email, password: hash });
+  const user = await this.create({
+    first_name,
+    last_name,
+    email,
+    password: hash,
+  });
   return user;
 };
 
