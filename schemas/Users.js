@@ -16,8 +16,7 @@ const budgetsSchema = new mongoose.Schema({
   budget_date: {
     type: Date,
   },
-})
-
+});
 
 //Schema for the user
 const usersSchema = new mongoose.Schema({
@@ -29,15 +28,21 @@ const usersSchema = new mongoose.Schema({
     unique: true,
   },
   password: { type: String, required: true },
-  country_code: { type: String},
+  country_code: { type: String },
   access_token: { type: String },
   budgets: [budgetsSchema],
 });
 
 // creating a custom static method
 
-usersSchema.statics.signup = async function (first_name, last_name, email, password, country_code, access_token) { 
-
+usersSchema.statics.signup = async function (
+  first_name,
+  last_name,
+  email,
+  password,
+  country_code,
+  access_token
+) {
   //check the existing of the user
 
   const exists = await this.findOne({ email });
@@ -64,7 +69,14 @@ usersSchema.statics.signup = async function (first_name, last_name, email, passw
   const hash = await bcrypt.hash(password, salt);
 
   //create user
-  const user = await this.create({ first_name, last_name, email, password: hash, country_code, access_token });
+  const user = await this.create({
+    first_name,
+    last_name,
+    email,
+    password: hash,
+    country_code,
+    access_token,
+  });
 
   return user;
 };

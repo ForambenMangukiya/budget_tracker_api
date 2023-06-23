@@ -48,6 +48,7 @@ const deleteTransaction = async (req, res) => {
 // function getAll Transactions for a user
 const getAllTransaction = async (req, res) => {
   try {
+    const timeperiod = req.query.timeperiod;
     const user = req.user._id;
     console.log("req.user._id:", req.user._id);
     const transactions = await Transaction.find({ user });
