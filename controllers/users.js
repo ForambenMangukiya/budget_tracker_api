@@ -114,10 +114,7 @@ const budget = async (req, res) => {
     if (!user) {
       res.status(404).json({ success: false, msg: "user is not found" });
     } else {
-      res.status(200).json({
-        success: true,
-        budgetData: user.budgets,
-      });
+      res.status(200).json(user.budgets);
     }
   } catch (error) {}
 };
