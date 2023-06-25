@@ -10,6 +10,7 @@ const util = require("util");
 const bodyParser = require("body-parser");
 const moment = require("moment");
 const { Configuration, PlaidEnvironments, PlaidApi } = require("plaid");
+const { Configuration, PlaidEnvironments, PlaidApi } = require("plaid");
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
