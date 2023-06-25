@@ -105,21 +105,52 @@ const deleteOneUser = async (req, res) => {
 
 // function get budgets
 
+// const budget = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     console.log("budget is working".bgRed);
+//     const user = await Users.findById(id);
+//     if (!user) {
+//       res.status(404).json({ success: false, msg: "user is not found" });
+//     } else {
+//       res.status(200).json({
+//         success: true,
+//         budgetData: user.budgets,
+//       });
+//     }
+//   } catch (error) {}
+// };
+
+//last
 const budget = async (req, res) => {
   try {
     const { id } = req.params;
+    const { category_name, budget_description, limit_amount, budget_date } =
+      req.body;
 
-    console.log("budget is working".bgRed);
     const user = await Users.findById(id);
     if (!user) {
-      res.status(404).json({ success: false, msg: "user is not found" });
-    } else {
-      res.status(200).json({
-        success: true,
-        budgetData: user.budgets,
-      });
+      res.status(404).json({ success: false, msg: "User not found" });
+      return;
     }
-  } catch (error) {}
+
+    const newBudget = {
+      category_name,
+      budget_description,
+      limit_amount,
+      budget_date,
+    };
+
+    user.budgets.push(newBudget);
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, msg: "Budget added", budgetData: newBudget });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
 };
 
 module.exports = {
