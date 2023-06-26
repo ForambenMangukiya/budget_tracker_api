@@ -69,12 +69,9 @@ const getAllTransaction = async (req, res) => {
   try {
     const { timeperiod } = req.query;
     const user = req.user._id;
-    console.log(timeperiod);
-    if (timeperiod === undefined) {
-      console.log("working inside first condition");
+    if (timeperiod === "all") {
       const user = req.user._id;
       const transactions = await Transaction.find({ user });
-      console.log("transactions without timeperiod :", transactions);
       res.status(200).json(transactions);
     } else {
       const user = req.user._id;
