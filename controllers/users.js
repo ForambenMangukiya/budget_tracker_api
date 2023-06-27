@@ -44,9 +44,9 @@ const signupUser = async (req, res) => {
 };
 
 // function updateUser
-
 const updateUser = async (req, res) => {
   try {
+    console.log("update this user id", req.params);
     const { id } = req.params;
     const updateFields = {};
     const {
@@ -65,13 +65,11 @@ const updateUser = async (req, res) => {
     if (password) updateFields.password = password;
     if (country_code) updateFields.country_code = country_code;
     if (access_token) updateFields.access_token = access_token;
-    if (budgets) updateFields.budgets = budgets;
+    if (budgets) updateFields.$push = { budgets: budgets };
 
-    const user = await Users.findOneAndUpdate(
-      { _id: id },
-      { $set: updateFields },
-      { new: true }
-    );
+    const user = await Users.findOneAndUpdate({ _id: id }, updateFields, {
+      new: true,
+    });
 
     if (!user) {
       return res.status(404).json({ success: false, msg: "User not found" });
@@ -129,11 +127,11 @@ const budget = async (req, res) => {
     const { category_name, budget_description, limit_amount, budget_date } =
       req.body;
 
+    //alt
     const user = await Users.findById(id);
     if (!user) {
       return res.status(404).json({ success: false, msg: "user is not found" });
     }
-
     // const user = await Users.findById(id);
     // if (!user) {
     //   res.status(404).json({ success: false, msg: "user is not found" });
@@ -148,7 +146,7 @@ const budget = async (req, res) => {
       budget_date,
     };
 
-    user.budgets.put(newBudget);
+    user.budgets.push(newBudget);
     await user.save();
 
     res
