@@ -10,7 +10,6 @@ const util = require("util");
 const bodyParser = require("body-parser");
 const moment = require("moment");
 const { Configuration, PlaidEnvironments, PlaidApi } = require("plaid");
-const { Configuration, PlaidEnvironments, PlaidApi } = require("plaid");
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -143,7 +142,45 @@ app.get("/api/transactions", async function (req, res, next) {
         cursor: cursor,
       };
 
-      const response = await client.transactionsSync(request);
+      const getTransactions = async () =>
+        Promise.resolve().then(async () => {
+          const SLEEP_TIME = 10000;
+          const MAX_RETRY = 3;
+
+          var retries = MAX_RETRY;
+          while (retries > 0) {
+            console.log(
+              "INFO: inside retryer function, retries remaining=",
+              retries
+            );
+
+            try {
+              const response = await client.transactionsSync(request);
+              if (response.data.added.length > 0) {
+                console.log("INFO: success! found non-zero array!");
+                return response;
+              }
+              console.log(
+                "WARNING: transactionsSync returned ok but had empty array!"
+              );
+            } catch (e) {
+              console.log("ERROR: transactionsSync failed:", e);
+            }
+
+            console.log("INFO: sleeping before next retry...");
+            await new Promise((resolve) => {
+              setTimeout((_) => {
+                resolve();
+              }, SLEEP_TIME); // sleep for N seconds
+            });
+
+            console.log("INFO: ...woken up; trying again");
+            retries = retries - 1;
+          }
+        });
+
+      const response = await getTransactions();
+
       const data = response.data;
       console.log("trans:", data);
       // Add this page of results

@@ -23,6 +23,9 @@ api.post("/signup", signupUser);
 api.route("/:id").put(updateUser).delete(deleteOneUser).get(budget);
 
 // Path to get budgets from one User
-api.route("/:id/budget").get(budget).post(budget);
+// api.route("/:id/budget").get(budget);
+// api.route("/:id/budget").post(budget);
+
+api.route("/:id").put(updateUser);
 
 module.exports = api;
