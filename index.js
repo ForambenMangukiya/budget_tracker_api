@@ -141,7 +141,7 @@ app.get("/api/transactions", async function (req, res, next) {
         access_token: ACCESS_TOKEN,
         cursor: cursor,
       };
-  
+
       const getTransactions = async () => Promise.resolve()
         .then(async () => {
           const SLEEP_TIME = 10000
@@ -175,7 +175,6 @@ app.get("/api/transactions", async function (req, res, next) {
         })
 
       const response = await getTransactions()
-
       const data = response.data;
       console.log("trans:", data);
       // Add this page of results
@@ -196,5 +195,5 @@ app.get("/api/transactions", async function (req, res, next) {
     res.status(200).json({ latest_transactions: recently_added });
   } catch (error) {
     res.status(400).json({ error: error.message });
-  };
+  }
 });
