@@ -180,7 +180,6 @@ app.get("/api/transactions", async function (req, res, next) {
         });
 
       const response = await getTransactions();
-
       const data = response.data;
       console.log("trans:", data);
       // Add this page of results
