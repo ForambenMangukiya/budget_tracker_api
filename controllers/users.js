@@ -46,8 +46,6 @@ const signupUser = async (req, res) => {
 // function updateUser
 const updateUser = async (req, res) => {
   try {
-    console.log("WE ARE IN THE UPDATE USER");
-    console.log("update this user id", req.params);
     const { id } = req.params;
     const updateFields = {};
     const {
