@@ -111,6 +111,7 @@ const budget = async (req, res) => {
 
     console.log("budget is working".bgRed);
     const user = await Users.findById(id);
+    console.log(user.budgets);
     if (!user) {
       res.status(404).json({ success: false, msg: "user is not found" });
     } else {
