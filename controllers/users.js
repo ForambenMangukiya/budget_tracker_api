@@ -44,7 +44,6 @@ const signupUser = async (req, res) => {
 };
 
 // function updateUser
-
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -65,13 +64,11 @@ const updateUser = async (req, res) => {
     if (password) updateFields.password = password;
     if (country_code) updateFields.country_code = country_code;
     if (access_token) updateFields.access_token = access_token;
-    if (budgets) updateFields.budgets = budgets;
+    if (budgets) updateFields.$push = { budgets: budgets };
 
-    const user = await Users.findOneAndUpdate(
-      { _id: id },
-      { $set: updateFields },
-      { new: true }
-    );
+    const user = await Users.findOneAndUpdate({ _id: id }, updateFields, {
+      new: true,
+    });
 
     if (!user) {
       return res.status(404).json({ success: false, msg: "User not found" });
@@ -105,19 +102,59 @@ const deleteOneUser = async (req, res) => {
 
 // function get budgets
 
+// const budget = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     console.log("budget is working".bgRed);
+//     const user = await Users.findById(id);
+//     if (!user) {
+//       res.status(404).json({ success: false, msg: "user is not found" });
+//     } else {
+//       res.status(200).json({
+//         success: true,
+//         budgetData: user.budgets,
+//       });
+//     }
+//   } catch (error) {}
+// };
+
+//last
 const budget = async (req, res) => {
   try {
     const { id } = req.params;
+    const { category_name, budget_description, limit_amount, budget_date } =
+      req.body;
 
-    console.log("budget is working".bgRed);
+    //alt
     const user = await Users.findById(id);
     console.log(user.budgets);
     if (!user) {
-      res.status(404).json({ success: false, msg: "user is not found" });
-    } else {
-      res.status(200).json(user.budgets);
+      return res.status(404).json({ success: false, msg: "user is not found" });
     }
-  } catch (error) {}
+    // const user = await Users.findById(id);
+    // if (!user) {
+    //   res.status(404).json({ success: false, msg: "user is not found" });
+    // } else {
+    //   res.status(200).json(user.budgets);
+    // }
+
+    const newBudget = {
+      category_name,
+      budget_description,
+      limit_amount,
+      budget_date,
+    };
+
+    user.budgets.push(newBudget);
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, msg: "Budget added", budgetData: newBudget });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
 };
 
 module.exports = {
