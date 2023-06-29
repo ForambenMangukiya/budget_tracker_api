@@ -45,6 +45,25 @@ const deleteTransaction = async (req, res) => {
   }
 };
 
+// function delete All Transaction
+const deleteAllTransactions = async (req, res) => {
+  try {
+    const deletedTransactions = await Transaction.deleteMany({
+      tran_amount: { $gte: 0 },
+    });
+
+    if (!deletedTransactions) {
+      return res.status(404).json({ error: "Something went wrong" });
+    }
+    res.status(200).json({
+      success: true,
+      msg: "successfully deleted all the transactions",
+    });
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+};
+
 // function getAll Transactions for a user
 const getAllTransaction = async (req, res) => {
   console.log("get all trans")
@@ -148,4 +167,5 @@ module.exports = {
   getAllTransaction,
   deleteTransaction,
   updateTransaction,
+  deleteAllTransactions,
 };
