@@ -123,8 +123,8 @@ const deleteOneUser = async (req, res) => {
 const budget = async (req, res) => {
   try {
     const { id } = req.params;
-    const { category_name, budget_description, limit_amount, budget_date } =
-      req.body;
+    // const { category_name, budget_description, limit_amount, budget_date } =
+    //   req.body;
 
     //alt
     const user = await Users.findById(id);
@@ -135,23 +135,23 @@ const budget = async (req, res) => {
     // const user = await Users.findById(id);
     // if (!user) {
     //   res.status(404).json({ success: false, msg: "user is not found" });
-    // } else {
-    //   res.status(200).json(user.budgets);
-    // }
+    else {
+      res.status(200).json(user.budgets);
+    }
 
-    const newBudget = {
-      category_name,
-      budget_description,
-      limit_amount,
-      budget_date,
-    };
+    // const newBudget = {
+    //   category_name,
+    //   budget_description,
+    //   limit_amount,
+    //   budget_date,
+    // };
 
-    user.budgets.push(newBudget);
-    await user.save();
+    // user.budgets.push(newBudget);
+    // await user.save();
 
-    res
-      .status(200)
-      .json({ success: true, msg: "Budget added", budgetData: newBudget });
+    // res
+    //   .status(200)
+    //   .json({ success: true, msg: "Budget added", budgetData: newBudget });
   } catch (error) {
     res.status(500).json({ success: false, error });
   }
