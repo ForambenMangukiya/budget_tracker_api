@@ -6,16 +6,14 @@ const connectDB = require("./dbinit");
 const PORT = process.env.PORT || 8080;
 
 // ---------------------------------------------------------------------
-const util = require("util");
 const bodyParser = require("body-parser");
-const moment = require("moment");
 const { Configuration, PlaidEnvironments, PlaidApi } = require("plaid");
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
-const PLAID_ENV = process.env.PLAID_ENV || "development";
+const PLAID_ENV = process.env.PLAID_ENV || "sandbox";
 const PLAID_PRODUCTS = (
-  process.env.PLAID_PRODUCTS || Products.Transactions
+  process.env.PLAID_PRODUCTS || "auth,transactions"
 ).split(",");
 
 const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || "DE").split(
@@ -83,7 +81,7 @@ app.post("/api/create_link_token/:_id", async function (req, res) {
       client_user_id: _id,
     },
     client_name: "Plaid Test App",
-    products: ["auth"],
+    products: ["transactions"],
     language: "en",
     webhook: "https://webhook.example.com",
     country_codes: ["DE"],
