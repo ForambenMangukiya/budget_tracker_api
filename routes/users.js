@@ -26,6 +26,4 @@ api.route("/:id").put(updateUser).delete(deleteOneUser).get(budget);
 // api.route("/:id/budget").get(budget);
 // api.route("/:id/budget").post(budget);
 
-api.route("/:id").put(updateUser);
-
 module.exports = api;

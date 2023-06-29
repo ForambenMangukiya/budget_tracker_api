@@ -13,7 +13,7 @@ const { Configuration, PlaidEnvironments, PlaidApi } = require("plaid");
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
-const PLAID_ENV = process.env.PLAID_ENV || "sandbox";
+const PLAID_ENV = process.env.PLAID_ENV || "development";
 const PLAID_PRODUCTS = (
   process.env.PLAID_PRODUCTS || Products.Transactions
 ).split(",");
@@ -72,8 +72,11 @@ app.listen(PORT, () => {
 //======================================================================================
 // Create a link token with configs which we can then use to initialize Plaid Link client-side.
 
-app.post("/api/create_link_token", async function (req, res) {
-  const _id = "648c93d4994cb7768eaecbd9";
+app.post("/api/create_link_token/:_id", async function (req, res) {
+  const { _id } = req.params;
+  // console.log("req.user:", req.user)
+  // const _id = req.user._id;
+  // const _id = "648c93d4994cb7768eaecbd9";
   const configs = {
     user: {
       // This should correspond to a unique id for the current user.
@@ -95,7 +98,6 @@ app.post("/api/create_link_token", async function (req, res) {
 
 // Exchange token flow - exchange a Link public_token for an API access_token
 app.post("/api/set_access_token", async function (req, res, next) {
-  console.log("req.body", req.body);
   PUBLIC_TOKEN = req.body.public_token;
   console.log("PUBLIC_TOKEN", PUBLIC_TOKEN);
   try {
@@ -105,7 +107,6 @@ app.post("/api/set_access_token", async function (req, res, next) {
 
     ACCESS_TOKEN = tokenResponse.data.access_token;
     ITEM_ID = tokenResponse.data.item_id;
-    console.log(">>>>ACCESS_TOKEN", ACCESS_TOKEN);
     console.log(">>>>ITEM_ID", ITEM_ID);
     // if (PLAID_PRODUCTS.includes(Products.Transfer)) {
     //     const TRANSFER_ID = await authorizeAndCreateTransfer(ACCESS_TOKEN);
@@ -122,9 +123,9 @@ app.post("/api/set_access_token", async function (req, res, next) {
 });
 
 // Retrieve Transactions for an Item
-app.get("/api/transactions", async function (req, res, next) {
+app.get("/api/transactions/:id", async function (req, res, next) {
+  const { id } = req.params;
   try {
-    console.log("Access Token to Get Txns", ACCESS_TOKEN);
     // Set cursor to empty to receive all historical updates
     let cursor = null;
 
@@ -181,7 +182,7 @@ app.get("/api/transactions", async function (req, res, next) {
 
       const response = await getTransactions();
       const data = response.data;
-      console.log("trans:", data);
+      // console.log("trans:", data);
       // Add this page of results
       added = added.concat(data.added);
       modified = modified.concat(data.modified);
@@ -196,9 +197,104 @@ app.get("/api/transactions", async function (req, res, next) {
     // Return the 8 most recent transactions
     const recently_added = [...added]
       .sort(compareTxnsByDateAscending)
-      .slice(-8);
+      .slice(-4);
+    // console.log("ALL added:", added )  
+
+    recently_added.map(async addedTransaction => {
+      const newTransaction = getTransactionFromImportedTxn(addedTransaction, id)
+      newTransaction.category_name = mapCategoryFromBank(addedTransaction.category)
+      await updateOrInsertTxn(newTransaction)  
+    })
+
+    // res.status(200).json({ all_transactions: added });
     res.status(200).json({ latest_transactions: recently_added });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
+
+const Transaction = require("./schemas/Transactions");
+
+async function updateOrInsertTxn(newTransaction) {
+  const foundTxn = await findTransactionByTranID(newTransaction.tran_id)
+  if (foundTxn == null){
+    insertTransaction(newTransaction)
+    return
+  }
+  updateTransaction(newTransaction)
+}
+
+async function findTransactionByTranID(tranID){
+  try {
+    const foundTransaction = await Transaction.findOne({ tran_id: tranID });
+    if (!foundTransaction) {
+      console.log('Transaction_ID not found');
+      return null;
+    }
+    console.log('Found transaction_ID:', foundTransaction);
+  } catch (error) {
+    console.error('Error finding transaction_ID:', error);
+  }
+}
+
+async function updateTransaction(newTransaction){
+  try {
+    const updatedTransaction = await Transaction.findOneAndUpdate(
+      { tran_id: newTransaction.tran_id }, // Query to find the document by its ID
+      { $set: newTransaction }, // Updated data to be applied using the $set operator
+      { new: true } // Options: returns the modified document after update
+    );
+
+    if (!updatedTransaction) {
+      console.log('Transaction not found');
+      return;
+    }
+    console.log('Transaction updated:', updatedTransaction);
+  } catch (error) {
+    console.error('Error updating transaction:', error);
+  }
+}
+
+async function insertTransaction(newTransaction){
+  try {
+    const newTran = await Transaction.create(newTransaction);
+    console.log("OK: inserted a new txn!", newTran)
+  } catch (error) {
+    console.error('Error adding transaction:', error);
+  }  
+}
+
+
+function mapCategoryFromBank(category){
+  if (category.length == 0) {
+    return "others"
+  }
+
+  // TODO lowercase the category
+  const lowercasedCategory = category[0]
+
+  switch (lowercasedCategory){
+  case "Food and Drink":
+    return "eatingout"
+  case "Travel":
+    return "transport"  
+  case "Payment":
+    return "bills" 
+  default:
+    return category[0]
+  }
+}
+
+function getTransactionFromImportedTxn(importedTxn, id) {
+  const txn = {
+      category_name: importedTxn.category,
+      tran_description: importedTxn.name,
+      tran_amount: importedTxn.amount,
+      tran_sign: "DR", 
+      tran_currency: "DE", 
+      tran_date: importedTxn.authorized_date,
+      user: id, 
+      tran_id: importedTxn.transaction_id,
+  }
+  return txn
+}
