@@ -1,7 +1,7 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
-require("dotenv").config();
 const connectDB = require("./dbinit");
 const PORT = process.env.PORT || 8080;
 
@@ -45,6 +45,7 @@ const client = new PlaidApi(configuration);
 
 const userRoutes = require("./routes/users");
 const transactionRoutes = require("./routes/transactions");
+const upload = require("./routes/upload");
 
 require("colors");
 connectDB();
@@ -59,6 +60,7 @@ app.use(bodyParser.json());
 
 app.use("/users", userRoutes);
 app.use("/transaction", transactionRoutes);
+app.use("/api", upload);
 
 app.get("/", (req, res) => {
   res.send("welcome to our Badget tracker API ");
@@ -67,6 +69,14 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`.america);
 });
+
+
+
+
+
+
+
+
 
 //======================================================================================
 // Create a link token with configs which we can then use to initialize Plaid Link client-side.
