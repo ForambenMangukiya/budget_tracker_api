@@ -64,7 +64,11 @@ const updateUser = async (req, res) => {
     if (password) updateFields.password = password;
     if (country_code) updateFields.country_code = country_code;
     if (access_token) updateFields.access_token = access_token;
-    if (budgets) updateFields.$push = { budgets: budgets };
+    // if (budgets) updateFields.$push = { budgets: budgets };
+    if (budgets) {
+      // If budgets field is present in the request body, update the budgets array
+      updateFields.budgets = budgets;
+    }
 
     const user = await Users.findOneAndUpdate({ _id: id }, updateFields, {
       new: true,
