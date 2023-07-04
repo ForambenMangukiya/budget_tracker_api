@@ -10,8 +10,6 @@ const RECORDING_MODE = process.env.RECORDING_MODE || false
 let ACCESS_TOKEN = null;
 let PUBLIC_TOKEN = null;
 let ITEM_ID = null;
-// let PAYMENT_ID = null;
-// let TRANSFER_ID = null;
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[PLAID_ENV],
@@ -35,8 +33,6 @@ const createLinkToken = async function (req, res) {
     console.log("INFO: inside createLinkToken()")
     const { _id } = req.params;
     // console.log("req.user:", req.user)
-    // const _id = req.user._id;
-    // const _id = "648c93d4994cb7768eaecbd9";
     const configs = {
     user: {
         // This should correspond to a unique id for the current user.
@@ -87,7 +83,7 @@ const setAccessToken = async function (req, res, next) {
 //==============================================================================================
 
 const syncTransactions = async function (req, res, next) {
-    console.log(">>>>ACCESS TOKEN:", ACCESS_TOKEN)
+    // console.log(">>>>ACCESS TOKEN:", ACCESS_TOKEN)
     const { id } = req.params;
     try {
       // Set cursor to empty to receive all historical updates
@@ -119,7 +115,6 @@ const syncTransactions = async function (req, res, next) {
           data = await fetchTransactionsFromPlaid(request)
         }
   
-        // console.log("trans:", data);
         // Add this page of results
         added = added.concat(data.added);
         modified = modified.concat(data.modified);
@@ -137,7 +132,7 @@ const syncTransactions = async function (req, res, next) {
         .sort(compareTxnsByDateAscending)
         .slice(-8);
       // console.log("ALL added:", added )
-      console.log(">>>>ACCESS_TOKEN", ACCESS_TOKEN);  
+      console.log(">>>>recent 8 trans only <<<<<");  
   
       recently_added.map(async addedTransaction => {
         // added.map(async addedTransaction => {
@@ -152,22 +147,6 @@ const syncTransactions = async function (req, res, next) {
       res.status(400).json({ error: error.message });
     }
   };
-  
- 
-  
-  // testing
-  // async function runUnitTest() {
-  //   const transactions = await fetchTransactionsFromPlaid({
-  //     access_token: "access-sandbox-5c67cd85-571d-4c4a-a10e-25421df37492",
-  //     cursor: null,
-  //   })
-  //   if (transactions.added === undefined) {
-  //     console.log("ERROR: runUnitTest(): trasactions.added === undefined")
-  //     return
-  //   }
-  //   console.log("OK: runUnitTest(): transactions is", transactions.added[0])
-  // }
-  // runUnitTest()
   
   async function fetchTransactionsFromPlaid(request) {
     return Promise.resolve().then(async () => {

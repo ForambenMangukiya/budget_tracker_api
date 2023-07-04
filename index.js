@@ -41,8 +41,6 @@ let TRANSFER_ID = null;
 
 // const client = new PlaidApi(configuration);
 
-//------------------------------------------------------------------------------------
-
 const userRoutes = require("./routes/users");
 const transactionRoutes = require("./routes/transactions");
 const upload = require("./routes/upload");
@@ -61,7 +59,7 @@ app.use(bodyParser.json());
 
 app.use("/users", userRoutes);
 app.use("/transaction", transactionRoutes);
-// app.use("/api", upload);
+app.use("/api", upload);
 app.use("/api", plaid);
 
 app.get("/", (req, res) => {
